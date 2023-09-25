@@ -1,0 +1,31 @@
+jf=1979-98-23T01:32:00Z 
+odt2 = 1979-05-27T00:32:00-07:00
+odt3 = 1979-05-27T00:32:00.999999-07:00
+odg5= 1979-05-27 07:32:00Z
+odg6= 1994-06-26
+odg7= 07:32:00
+odg8= 07:32:00.999999
+bid="hello"
+server=true
+port=1000
+parts=[1, 2, 3, "hello", 07:32:00, false, ["boy"]]
+
+[no_section]
+
+[head]
+k=[1979-98-23T01:32:00Z , 12, "hello", [07:32:00]]
+
+[head4]
+kgg= false
+
+[[header]]
+
+[[heard]]
+ghn=459
+giel=true
+
+[new]
+a="piloy"
+b=90
+
+# this is a comment

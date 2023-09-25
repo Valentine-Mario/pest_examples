@@ -1,0 +1,41 @@
+WHITESPACE= _{" "| "\t" | "\r" }
+COMMENT = _{ "#" ~ (!"\n" ~ ANY)* }
+char = { ASCII_ALPHANUMERIC | "." | "_" | "/" }
+name = @{ char+ }
+
+pair= {name ~ "=" ~ value}
+header = {"[" ~ name ~ "]"}
+arrray_header = { "[" ~ "[" ~ name ~ "]" ~ "]"}
+section= {header ~ NEWLINE+ ~ pair ~ (NEWLINE+ ~ pair)*}
+array_section= {arrray_header ~ NEWLINE+ ~ pair ~ (NEWLINE+ ~ pair)*}
+
+value= _{string |  offset_date_time | date | time| number | boolean | array }
+boolean = {"true"|"false"}
+array={
+    "["~"]" | "[" ~ value ~ ("," ~ value)* ~ ","? ~"]"
+}
+offset_date_time= ${ date ~("T" | " "?) ~ time
+}
+date = ${
+    ASCII_DIGIT{4} ~ 
+    "-" ~ ASCII_DIGIT{2} ~ 
+    "-" ~ ASCII_DIGIT{2}}
+time= ${
+    ASCII_DIGIT{2} ~ 
+    ":" ~ ASCII_DIGIT{2} ~ ":" ~ (ASCII_ALPHA_UPPER | ASCII_DIGIT | ":" | "-"| ".")+
+}
+
+string = ${"\"" ~ inner ~ "\""}
+inner = @{str_char*}
+str_char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+    | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+number = @{
+    "-"?
+    ~ ("0"| ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*)
+    ~ ("." ~ ASCII_DIGIT*)?
+    ~ (^"e" ~ ("+"|"-")? ~ ASCII_DIGIT+)?
+}
+toml = { SOI ~ ((section | array_section| pair | header | arrray_header)? ~ NEWLINE)* ~ EOI}
