@@ -29,5 +29,6 @@ giel=true
 [new]
 a="pilot"
 b=90
+develop="value1"
 
 # this is a comment

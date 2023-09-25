@@ -51,6 +51,21 @@ pub fn parse_toml<'a>(
                     inner_pair.push(parse_pair(val))
                 }
                 output.push(Section((header, inner_pair)));
+            },
+            Rule::array_section=>{
+                let mut pair_value = val.into_inner();
+                let header = pair_value
+                    .next()
+                    .unwrap()
+                    .into_inner()
+                    .next()
+                    .unwrap()
+                    .as_str();
+                let mut inner_pair: Vec<TOMLAst<'a>> = vec![];
+                for val in pair_value.next().unwrap().into_inner().into_iter() {
+                    inner_pair.push(parse_pair(val))
+                }
+                output.push(ArraySection((header, inner_pair)));
             }
             Rule::pair => output.push(parse_pair(val)),
             _ => {}
