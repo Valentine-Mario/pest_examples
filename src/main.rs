@@ -31,7 +31,7 @@ fn main() {
     let output = vec![];
     let toml_ast: Result<Vec<toml::TOMLAst<'_>>, pest::error::Error<TOMLRule>> =
         parse_toml(toml_rule, output);
-    println!("{:?}", toml_ast);
+    println!("AST: {:?}", toml_ast);
     // let successful_parse = csv::CSVParser::parse(Rule::field, "-273.15");
     // println!("{:?}", successful_parse);
 

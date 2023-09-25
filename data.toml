@@ -14,9 +14,11 @@ parts=[1, 2, 3, "hello", 07:32:00, false, ["boy"]]
 
 [head]
 k=[1979-98-23T01:32:00Z , 12, "hello", [07:32:00]]
+l=90
 
 [head4]
 kgg= false
+boy="as"
 
 [[header]]
 
@@ -25,7 +27,7 @@ ghn=459
 giel=true
 
 [new]
-a="piloy"
+a="pilot"
 b=90
 
 # this is a comment

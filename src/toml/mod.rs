@@ -37,18 +37,34 @@ pub fn parse_toml<'a>(
             Rule::header => {
                 output.push(Header(val.as_str()));
             }
-
-            Rule::pair => {
+            Rule::section => {
                 let mut pair_value = val.into_inner();
-                let name = pair_value.next().unwrap().as_str();
-                let value = parse_type(pair_value.next().unwrap());
-                output.push(Pair((name, Box::new(value))))
+                let header = pair_value
+                    .next()
+                    .unwrap()
+                    .into_inner()
+                    .next()
+                    .unwrap()
+                    .as_str();
+                let mut inner_pair: Vec<TOMLAst<'a>> = vec![];
+                for val in pair_value.next().unwrap().into_inner().into_iter() {
+                    inner_pair.push(parse_pair(val))
+                }
+                output.push(Section((header, inner_pair)));
             }
+            Rule::pair => output.push(parse_pair(val)),
             _ => {}
         }
     }
 
     Ok(output.to_vec())
+}
+
+fn parse_pair<'a>(toml_val: Pair<'a, Rule>) -> TOMLAst<'a> {
+    let mut pair_value = toml_val.into_inner();
+    let name = pair_value.next().unwrap().as_str();
+    let value = parse_type(pair_value.next().unwrap());
+    TOMLAst::Pair((name, Box::new(value)))
 }
 
 fn parse_type<'a>(toml_val: Pair<'a, Rule>) -> TOMLAst<'a> {

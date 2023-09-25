@@ -6,8 +6,9 @@ name = @{ char+ }
 pair= {name ~ "=" ~ value}
 header = {"[" ~ name ~ "]"}
 arrray_header = { "[" ~ "[" ~ name ~ "]" ~ "]"}
-section= {header ~ NEWLINE+ ~ pair ~ (NEWLINE+ ~ pair)*}
-array_section= {arrray_header ~ NEWLINE+ ~ pair ~ (NEWLINE+ ~ pair)*}
+section= {header  ~ NEWLINE+ ~ section_property }
+array_section= {arrray_header ~ NEWLINE+ ~ section_property}
+section_property={pair ~ (NEWLINE+ ~ pair)*}
 
 value= _{string |  offset_date_time | date | time| number | boolean | array }
 boolean = {"true"|"false"}
