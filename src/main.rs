@@ -5,7 +5,7 @@ use pest::{iterators::Pair, Parser};
 use crate::csv::{CSVParser, Rule};
 use crate::ini::{IniParser, Rule as IniRule};
 use crate::json::{parse_json_file, serialize_jsonvalue, JSONValue};
-use crate::toml::{Rule as TOMLRule, TOMLParser, parse_toml};
+use crate::toml::{parse_toml, Rule as TOMLRule, TOMLParser};
 
 pub mod csv;
 pub mod ini;
@@ -24,9 +24,13 @@ fn main() {
     // );
 
     let unparsed_toml = fs::read_to_string("data.toml").expect("cannot read file");
-    let toml_rule = TOMLParser::parse(TOMLRule::toml, &unparsed_toml).unwrap().next().unwrap();
-    let output=vec![];
-    let toml_ast: Result<Vec<toml::TOMLAst<'_>>, pest::error::Error<TOMLRule>>= parse_toml(toml_rule, output);
+    let toml_rule = TOMLParser::parse(TOMLRule::toml, &unparsed_toml)
+        .unwrap()
+        .next()
+        .unwrap();
+    let output = vec![];
+    let toml_ast: Result<Vec<toml::TOMLAst<'_>>, pest::error::Error<TOMLRule>> =
+        parse_toml(toml_rule, output);
     println!("{:?}", toml_ast);
     // let successful_parse = csv::CSVParser::parse(Rule::field, "-273.15");
     // println!("{:?}", successful_parse);
