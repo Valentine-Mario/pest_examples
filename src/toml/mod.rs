@@ -8,8 +8,8 @@ pub struct TOMLParser;
 
 #[derive(Debug, Clone)]
 pub enum TOMLAst<'a> {
-    Section((&'a str, Vec<TOMLAst<'a>>)),
-    ArraySection((&'a str, Vec<TOMLAst<'a>>)),
+    Section((Vec<&'a str>, Vec<TOMLAst<'a>>)),
+    ArraySection((Vec<&'a str>, Vec<TOMLAst<'a>>)),
     String(&'a str),
     Number(f64),
     Boolean(bool),
@@ -17,9 +17,9 @@ pub enum TOMLAst<'a> {
     OffsetDateTime(&'a str),
     Date(&'a str),
     Time(&'a str),
-    Header(&'a str),
-    ArrayHeader(&'a str),
-    Pair((&'a str, Box<TOMLAst<'a>>)),
+    Header(Vec<&'a str>),
+    ArrayHeader(Vec<&'a str>),
+    Pair((Vec<&'a str>, Box<TOMLAst<'a>>)),
     Null(()),
 }
 
@@ -32,10 +32,12 @@ pub fn parse_toml<'a>(
     for val in toml_val.into_inner().into_iter() {
         match val.as_rule() {
             Rule::arrray_header => {
-                output.push(ArrayHeader(val.as_str()));
+                let arr_head:Vec<&str>=val.into_inner().as_str().split(".").collect();
+                output.push(ArrayHeader(arr_head));
             }
             Rule::header => {
-                output.push(Header(val.as_str()));
+                let head:Vec<&str>=val.into_inner().as_str().split(".").collect();
+                output.push(Header(head));
             }
             Rule::section => {
                 let mut pair_value = val.into_inner();
@@ -45,7 +47,8 @@ pub fn parse_toml<'a>(
                     .into_inner()
                     .next()
                     .unwrap()
-                    .as_str();
+                    .as_str()
+                    .split(".").collect();
                 let mut inner_pair: Vec<TOMLAst<'a>> = vec![];
                 for val in pair_value.next().unwrap().into_inner().into_iter() {
                     inner_pair.push(parse_pair(val))
@@ -60,7 +63,8 @@ pub fn parse_toml<'a>(
                     .into_inner()
                     .next()
                     .unwrap()
-                    .as_str();
+                    .as_str()
+                    .split(".").collect();
                 let mut inner_pair: Vec<TOMLAst<'a>> = vec![];
                 for val in pair_value.next().unwrap().into_inner().into_iter() {
                     inner_pair.push(parse_pair(val))
@@ -77,7 +81,7 @@ pub fn parse_toml<'a>(
 
 fn parse_pair<'a>(toml_val: Pair<'a, Rule>) -> TOMLAst<'a> {
     let mut pair_value = toml_val.into_inner();
-    let name = pair_value.next().unwrap().as_str();
+    let name = pair_value.next().unwrap().as_str().split(".").collect();
     let value = parse_type(pair_value.next().unwrap());
     TOMLAst::Pair((name, Box::new(value)))
 }
