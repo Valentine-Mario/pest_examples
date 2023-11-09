@@ -11,6 +11,7 @@ pub mod csv;
 pub mod ini;
 pub mod json;
 pub mod toml;
+pub mod jlang;
 fn main() {
     //parse json
     // let unparsed_file = fs::read_to_string("data.json").expect("cannot read file");

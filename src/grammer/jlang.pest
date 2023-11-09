@@ -1,0 +1,24 @@
+WHITESPACE = _{" " | "\t"}
+COMMENT = _{ "NB." ~ (!"\n" ~ ANY)* }
+integer = @{ "_"? ~ ASCII_DIGIT+ }
+decimal = @{ "_"? ~ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT* }
+ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+string = @{"'" ~ ( "''" | (!"'" ~ ANY) )* ~ "'"}
+verb= {
+    ">:" | "*:" | "-"  | "%" | "#" | ">."
+  | "+"  | "*"  | "<"  | "=" | "^" | "|"
+  | ">"  | "$"
+}
+terms = { term+}
+term = _{ decimal | integer | ident | "(" ~ expr ~ ")" }
+
+//A monadic expression consists of a verb with its sole operand on the right; 
+//a dyadic expression has operands on either side of the verb. 
+//Assignment expressions associate identifiers with expressions.
+monadicExpr= { verb ~ expr}
+dyadicExpr= { (monadicExpr | terms) ~ verb ~ expr}
+assgmtExpr = {ident ~ "=:" ~ expr}
+
+expr = { assgmtExpr | monadicExpr | dyadicExpr | string | terms}
+stmt = _{expr}
+program=_{ SOI ~ "\n"* ~ (stmt ~ "\n"+) * ~ stmt? ~ EOI}
