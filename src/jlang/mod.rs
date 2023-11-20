@@ -92,6 +92,21 @@ fn parse_dyadic_verb(pair: Pair<Rule>, lhs: AstNode, rhs: AstNode) -> AstNode {
     }
 }
 
+fn parse_monadic_verb(pair: Pair<Rule>, expr: AstNode) -> AstNode {
+    AstNode::MonadicOp {
+        verb: match pair.as_str() {
+            ">:" => MonadicVerb::Increment,
+            "*:" => MonadicVerb::Square,
+            "-" => MonadicVerb::Negate,
+            "%" => MonadicVerb::Reciprocal,
+            "#" => MonadicVerb::Tally,
+            ">." => MonadicVerb::Ceiling,
+            "$" => MonadicVerb::ShapeOf,
+            _ => panic!("Unsupported monadic verb: {}", pair.as_str()),
+        },
+        expr: Box::new(expr),
+    }
+}
 fn build_ast_from_expr(pair: Pair<Rule>) -> AstNode {
     AstNode::Integer(40)
 }
