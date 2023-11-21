@@ -7,6 +7,7 @@ use std::ffi::CString;
 #[grammar = "grammer/jlang.pest"]
 pub struct JLangParser;
 
+#[derive(Clone)]
 pub enum MonadicVerb {
     Increment,
     Square,
@@ -17,6 +18,7 @@ pub enum MonadicVerb {
     ShapeOf,
 }
 
+#[derive(Clone)]
 pub enum DyadicVerb {
     Plus,
     Times,
@@ -33,6 +35,7 @@ pub enum DyadicVerb {
     Shape,
 }
 
+#[derive(Clone)]
 pub enum AstNode {
     Print(Box<AstNode>),
     Integer(i32),
@@ -108,7 +111,52 @@ fn parse_monadic_verb(pair: Pair<Rule>, expr: AstNode) -> AstNode {
     }
 }
 fn build_ast_from_expr(pair: Pair<Rule>) -> AstNode {
-    AstNode::Integer(40)
+    match pair.as_rule() {
+        Rule::expr => build_ast_from_expr(pair.into_inner().next().unwrap()),
+        Rule::dyadicExpr => {
+            let mut pair = pair.into_inner();
+            let lhspair = pair.next().unwrap();
+            let lhs = build_ast_from_expr(lhspair);
+            let verb = pair.next().unwrap();
+            let rhspair = pair.next().unwrap();
+            let rhs = build_ast_from_expr(rhspair);
+            parse_dyadic_verb(verb, lhs, rhs)
+        }
+        Rule::terms => {
+            let terms: Vec<AstNode> = pair.into_inner().map(build_ast_from_term).collect();
+            //if there is just a single term, return it without wrapping it in terms node
+            match terms.len() {
+                1 => terms.get(0).unwrap().clone(),
+                _ => AstNode::Terms(terms),
+            }
+        }
+        Rule::monadicExpr => {
+            let mut pair = pair.into_inner();
+            let verb = pair.next().unwrap();
+            let expr = pair.next().unwrap();
+            let expr = build_ast_from_expr(expr);
+            parse_monadic_verb(verb, expr)
+        }
+        Rule::assgmtExpr => {
+            let mut pair = pair.into_inner();
+            let ident = pair.next().unwrap();
+            let expr = pair.next().unwrap();
+            let expr = build_ast_from_expr(expr);
+            AstNode::IsGlobal {
+                ident: String::from(ident.as_str()),
+                expr: Box::new(expr),
+            }
+        }
+        Rule::string => {
+            let str = &pair.as_str();
+            //strip leading and ending quote
+            let str = &str[1..str.len() - 1];
+            //escaped string quote become single quotes
+            let str = str.replace("''", "'");
+            AstNode::Str(CString::new(&str[..]).unwrap())
+        }
+        unknown_expr => panic!("unexpected expression {:?}", unknown_expr),
+    }
 }
 
 fn build_ast_from_term(pair: Pair<Rule>) -> AstNode {
