@@ -7,7 +7,7 @@ use std::ffi::CString;
 #[grammar = "grammer/jlang.pest"]
 pub struct JLangParser;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum MonadicVerb {
     Increment,
     Square,
@@ -18,7 +18,7 @@ pub enum MonadicVerb {
     ShapeOf,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum DyadicVerb {
     Plus,
     Times,
@@ -35,7 +35,7 @@ pub enum DyadicVerb {
     Shape,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AstNode {
     Print(Box<AstNode>),
     Integer(i32),

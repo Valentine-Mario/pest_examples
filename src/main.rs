@@ -23,6 +23,10 @@ fn main() {
     //     serialize_jsonvalue(&json_parsed),
     //     json_parsed
     // );
+    let unparsed_file = std::fs::read_to_string("example.ijs")
+      .expect("cannot read ijs file");
+    let astnode = jlang::parse(&unparsed_file).expect("unsuccessful parse");
+    println!("JLANG {:?}", &astnode);
 
     let unparsed_toml = fs::read_to_string("data.toml").expect("cannot read file");
     let toml_rule = TOMLParser::parse(TOMLRule::toml, &unparsed_toml)
